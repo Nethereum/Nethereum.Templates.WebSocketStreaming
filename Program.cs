@@ -54,13 +54,16 @@ namespace Nethereum.WSLogStreamingUniswapSample
                     
                     );
 
+                    eventSubscription.GetSubscribeResponseAsObservable().Subscribe(id => Console.WriteLine($"Subscribed with id: {id}"));
+
                     var filterAuction = Event<SwapEventDTO>.GetEventABI().CreateFilterInput(pairContractAddress);
 
                     await client.StartAsync();
 
                     await eventSubscription.SubscribeAsync(filterAuction);
 
-                    await Task.Delay(600000);
+                    Console.ReadLine();
+               
                     await eventSubscription.UnsubscribeAsync();
                 }
                 catch (Exception e)
