@@ -10,60 +10,39 @@ namespace Nethereum.WSLogStreamingUniswapSample
 {
     class Program
     {
+
         public static async Task Main()
         {
-            var token0 = "DAI";
-            var token1 = "ETH";
-            var pairContractAddress = "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11";
+
+            var contractAddress = "0x6b175474e89094c44da98b954eedeac495271d0f";
 
             using (var client = new StreamingWebSocketClient("wss://mainnet.infura.io/ws/v3/7238211010344719ad14a89db874158c"))
             {
-                Console.WriteLine($"Uniswap trades for {token0} and {token1}");
-                try
-                { 
+
+                try { 
                     var eventSubscription = new EthLogsObservableSubscription(client);
                     eventSubscription.GetSubscriptionDataResponsesAsObservable().Subscribe(log =>
                     {
-                        var swap = log.DecodeEvent<SwapEventDTO>();
-
-                        var amount0Out = Web3.Web3.Convert.FromWei(swap.Event.Amount0Out);
-                        var amount1In = Web3.Web3.Convert.FromWei(swap.Event.Amount1In);
-
-
-                        var amount0In = Web3.Web3.Convert.FromWei(swap.Event.Amount0In);
-                        var amount1Out = Web3.Web3.Convert.FromWei(swap.Event.Amount1Out);
-
-
-                        if (swap.Event.Amount0In == 0 && swap.Event.Amount1Out == 0)
-                        {
-
-                            var price = amount0Out / amount1In;
-                            var quantity = amount1In;
-
-                            Console.WriteLine($"Sell {token1} Price: {price.ToString("F4")} Quantity: {quantity.ToString("F4")}, From: {swap.Event.To}  Block: {swap.Log.BlockNumber}");
-                        }
-                        else
-                        {
-
-                            var price = amount0In / amount1Out;
-                            var quantity = amount1Out;
-                            Console.WriteLine($"Buy {token1} Price: {price.ToString("F4")} Quantity: {quantity.ToString("F4")}, From: {swap.Event.To}  Block: {swap.Log.BlockNumber}");
-
-                        }
+                        var transfer = log.DecodeEvent<TransferEventDTO>();
+                        Console.WriteLine(transfer.Log.TransactionHash);
+                        //Console.WriteLine(transfer.Event.From);
+                        //Console.WriteLine(transfer.Event.To);
+                        //Console.WriteLine(transfer.Event.Value.ToString());
+                      
                     }
-                    
+
                     );
 
                     eventSubscription.GetSubscribeResponseAsObservable().Subscribe(id => Console.WriteLine($"Subscribed with id: {id}"));
 
-                    var filterAuction = Event<SwapEventDTO>.GetEventABI().CreateFilterInput(pairContractAddress);
+                    var filterAuction = Event<TransferEventDTO>.GetEventABI().CreateFilterInput(contractAddress);
 
                     await client.StartAsync();
 
                     await eventSubscription.SubscribeAsync(filterAuction);
 
                     Console.ReadLine();
-               
+
                     await eventSubscription.UnsubscribeAsync();
                 }
                 catch (Exception e)
@@ -75,22 +54,16 @@ namespace Nethereum.WSLogStreamingUniswapSample
     }
 
 
-    public partial class SwapEventDTO : SwapEventDTOBase { }
-
-    [Event("Swap")]
-    public class SwapEventDTOBase : IEventDTO
+    [Event("Transfer")]
+    public class TransferEventDTO : IEventDTO
     {
-        [Parameter("address", "sender", 1, true)]
-        public virtual string Sender { get; set; }
-        [Parameter("uint256", "amount0In", 2, false)]
-        public virtual BigInteger Amount0In { get; set; }
-        [Parameter("uint256", "amount1In", 3, false)]
-        public virtual BigInteger Amount1In { get; set; }
-        [Parameter("uint256", "amount0Out", 4, false)]
-        public virtual BigInteger Amount0Out { get; set; }
-        [Parameter("uint256", "amount1Out", 5, false)]
-        public virtual BigInteger Amount1Out { get; set; }
-        [Parameter("address", "to", 6, true)]
-        public virtual string To { get; set; }
+        [Parameter("address", "_from", 1, true)]
+        public string From { get; set; }
+
+        [Parameter("address", "_to", 2, true)]
+        public string To { get; set; }
+
+        [Parameter("uint256", "_value", 3, false)]
+        public BigInteger Value { get; set; }
     }
 }
