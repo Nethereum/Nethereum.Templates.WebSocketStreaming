@@ -1,0 +1,19 @@
+{
+    "author": "Juan Blanco",
+    "classifications": ["Nethereum", "WebSocketStreaming"],
+    "name": "Nethereum WebSocketStreaming Template,
+    "tags": {
+        "language": "C#"
+    },
+    "identity": "nethererum.websocketstreaming",
+    "shortName": "nethereumstreaming",
+    "sourceName": "NethereumStreaming",
+    "guids": [
+        "{9A19103F-16F7-4668-BE54-9A1E7A4F7556}"
+    ],
+    "primaryOutputs": [{
+            "path": "Nethereum.Templates.WebSocketStreaming.csproj"
+        }
+    ],
+    "exclude": ["**/[Bb]in/**", "**/[Oo]bj/**", ".template.config/**/*", "**/*.lock.json"]
+    }
