@@ -9,7 +9,7 @@ using System.Numerics;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
-namespace Nethereum.WebSocketsStreamingTest
+namespace Nethereum.Templates.WebSocketStreaming
 {
 
     internal class ExampleLogsUniswapSwapsSubscription
@@ -33,63 +33,63 @@ namespace Nethereum.WebSocketsStreamingTest
             var token1 = "ETH";
             var pairContractAddress = "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11";
 
-       
-                Console.WriteLine($"Uniswap trades for {token0} and {token1}");
-                try
+
+            Console.WriteLine($"Uniswap trades for {token0} and {token1}");
+            try
+            {
+                var eventSubscription = new EthLogsObservableSubscription(client);
+                eventSubscription.GetSubscriptionDataResponsesAsObservable().Subscribe(log =>
                 {
-                    var eventSubscription = new EthLogsObservableSubscription(client);
-                    eventSubscription.GetSubscriptionDataResponsesAsObservable().Subscribe(log =>
+                    var swap = log.DecodeEvent<SwapEventDTO>();
+
+                    var amount0Out = Util.UnitConversion.Convert.FromWei(swap.Event.Amount0Out);
+                    var amount1In = Util.UnitConversion.Convert.FromWei(swap.Event.Amount1In);
+
+
+                    var amount0In = Util.UnitConversion.Convert.FromWei(swap.Event.Amount0In);
+                    var amount1Out = Util.UnitConversion.Convert.FromWei(swap.Event.Amount1Out);
+
+
+                    if (swap.Event.Amount0In == 0 && swap.Event.Amount1Out == 0)
                     {
-                        var swap = log.DecodeEvent<SwapEventDTO>();
 
-                        var amount0Out = Util.UnitConversion.Convert.FromWei(swap.Event.Amount0Out);
-                        var amount1In = Util.UnitConversion.Convert.FromWei(swap.Event.Amount1In);
+                        var price = amount0Out / amount1In;
+                        var quantity = amount1In;
 
-
-                        var amount0In = Util.UnitConversion.Convert.FromWei(swap.Event.Amount0In);
-                        var amount1Out = Util.UnitConversion.Convert.FromWei(swap.Event.Amount1Out);
-
-
-                        if (swap.Event.Amount0In == 0 && swap.Event.Amount1Out == 0)
-                        {
-
-                            var price = amount0Out / amount1In;
-                            var quantity = amount1In;
-
-                            Console.WriteLine($"Sell {token1} Price: {price.ToString("F4")} Quantity: {quantity.ToString("F4")}, From: {swap.Event.To}  Block: {swap.Log.BlockNumber}");
-                        }
-                        else
-                        {
-
-                            var price = amount0In / amount1Out;
-                            var quantity = amount1Out;
-                            Console.WriteLine($"Buy {token1} Price: {price.ToString("F4")} Quantity: {quantity.ToString("F4")}, From: {swap.Event.To}  Block: {swap.Log.BlockNumber}");
-
-                        }
+                        Console.WriteLine($"Sell {token1} Price: {price.ToString("F4")} Quantity: {quantity.ToString("F4")}, From: {swap.Event.To}  Block: {swap.Log.BlockNumber}");
                     }
+                    else
+                    {
 
-                    );
+                        var price = amount0In / amount1Out;
+                        var quantity = amount1Out;
+                        Console.WriteLine($"Buy {token1} Price: {price.ToString("F4")} Quantity: {quantity.ToString("F4")}, From: {swap.Event.To}  Block: {swap.Log.BlockNumber}");
 
-                    eventSubscription.GetSubscribeResponseAsObservable().Subscribe(id => Console.WriteLine($"Subscribed with id: {id}"));
-
-                    var filterAuction = Event<SwapEventDTO>.GetEventABI().CreateFilterInput(pairContractAddress);
-
-                    await client.StartAsync();
-
-                    await eventSubscription.SubscribeAsync(filterAuction);
-
-                    Console.ReadLine();
-
-                    await eventSubscription.UnsubscribeAsync();
+                    }
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                }
+
+                );
+
+                eventSubscription.GetSubscribeResponseAsObservable().Subscribe(id => Console.WriteLine($"Subscribed with id: {id}"));
+
+                var filterAuction = Event<SwapEventDTO>.GetEventABI().CreateFilterInput(pairContractAddress);
+
+                await client.StartAsync();
+
+                await eventSubscription.SubscribeAsync(filterAuction);
+
+                Console.ReadLine();
+
+                await eventSubscription.UnsubscribeAsync();
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
 
-            
-        
+
+
 
         private async void Client_Error(object sender, Exception ex)
         {

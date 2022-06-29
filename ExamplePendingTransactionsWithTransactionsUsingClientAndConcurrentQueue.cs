@@ -8,7 +8,7 @@ using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nethereum.WebSocketsStreamingTest
+namespace Nethereum.Templates.WebSocketStreaming
 {
     internal class ExamplePendingTransactionsWithTransactionsUsingClientAndConcurrentQueue
     {
@@ -33,7 +33,7 @@ namespace Nethereum.WebSocketsStreamingTest
 
         public StreamingWebSocketClient GetNextWebSocketStreamingClient()
         {
-           
+
             StreamingWebSocketClient returnClient;
             while (ConcurrentQueueTransactions.TryDequeue(out returnClient) == false) ;
             return returnClient;
@@ -67,7 +67,7 @@ namespace Nethereum.WebSocketsStreamingTest
             }
 
             if (ConcurrentQueueTransactions == null) SetupNewConcurrentQueue(20);
-            
+
             var pendingTransactionsSubscription = new EthNewPendingTransactionObservableSubscription(client);
 
             pendingTransactionsSubscription.GetSubscribeResponseAsObservable().SelectMany(async subscriptionId =>
@@ -85,29 +85,29 @@ namespace Nethereum.WebSocketsStreamingTest
                     var currentClient = GetNextWebSocketStreamingClient();
                     var transactionByHash = new EthGetTransactionByHashObservableHandler(currentClient);
                     var txnSub = transactionByHash.GetResponseAsObservable().Subscribe(
-                            
-                            transaction => 
+
+                            transaction =>
                             {
-                                    ConcurrentQueueTransactions.Enqueue(currentClient);
-                                    if (transaction != null)
-                                    {
-                                        Console.WriteLine("TransactionHash: " + transaction.TransactionHash + " Transaction From: " + transaction.From + " to :" + transaction.To);
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("Null transaction response, you could try again ... ");
-                                    }
+                                ConcurrentQueueTransactions.Enqueue(currentClient);
+                                if (transaction != null)
+                                {
+                                    Console.WriteLine("TransactionHash: " + transaction.TransactionHash + " Transaction From: " + transaction.From + " to :" + transaction.To);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Null transaction response, you could try again ... ");
+                                }
                             }, exception =>
                             {
-                                 currentClient.StopAsync().Wait();
-                                 currentClient = null;
-                                 EnqueueNewClient();
+                                currentClient.StopAsync().Wait();
+                                currentClient = null;
+                                EnqueueNewClient();
                                 Console.WriteLine("Error transaction by hash:" + exception.Message);
                             }
                          );
-                
+
                     transactionByHash.SendRequestAsync(transactionHash).Wait();
-                
+
                 }
                 , exception =>
                 {
@@ -115,8 +115,8 @@ namespace Nethereum.WebSocketsStreamingTest
                     Console.WriteLine("Pending transactions error info:" + exception.Message);
                 });
 
-               pendingTransactionsSubscription.GetUnsubscribeResponseAsObservable().Subscribe(response =>
-                            Console.WriteLine("Pending transactions unsubscribe result: " + response));
+            pendingTransactionsSubscription.GetUnsubscribeResponseAsObservable().Subscribe(response =>
+                         Console.WriteLine("Pending transactions unsubscribe result: " + response));
 
 
 

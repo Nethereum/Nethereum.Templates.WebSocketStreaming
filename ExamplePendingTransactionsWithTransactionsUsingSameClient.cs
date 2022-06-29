@@ -7,7 +7,7 @@ using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nethereum.WebSocketsStreamingTest
+namespace Nethereum.Templates.WebSocketStreaming
 {
 
     internal class ExamplePendingTransactionsWithTransactionsUsingSameClient

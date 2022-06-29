@@ -5,7 +5,7 @@ using System;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
-namespace Nethereum.WebSocketsStreamingTest
+namespace Nethereum.Templates.WebSocketStreaming
 {
     internal class ExampleNormalRPCCalls
     {
@@ -21,7 +21,7 @@ namespace Nethereum.WebSocketsStreamingTest
             if (client == null)
             {
                 client = new StreamingWebSocketClient(url);
-                
+
             }
 
             var ethGetBalance = new EthGetBalanceObservableHandler(client);
