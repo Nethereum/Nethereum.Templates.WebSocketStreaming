@@ -1,13 +1,13 @@
 {
     "author": "Juan Blanco",
     "classifications": ["Nethereum", "WebSocketStreaming"],
-    "name": "Nethereum WebSocketStreaming Template,
+    "name": "Nethereum WebSocket Streaming Template",
     "tags": {
         "language": "C#"
     },
     "identity": "nethererum.websocketstreaming",
-    "shortName": "nethereumstreaming",
-    "sourceName": "NethereumStreaming",
+    "shortName": "nethereumwsstream",
+    "sourceName": "NethereumWSStreaming",
     "guids": [
         "{9A19103F-16F7-4668-BE54-9A1E7A4F7556}"
     ],
