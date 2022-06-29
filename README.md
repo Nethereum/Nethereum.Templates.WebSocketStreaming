@@ -1,3 +1,10 @@
-## Websocket log streaming example
+## Websocket streaming example template
 
-Simple sample of using Nethereum Websockets streaming to retrieve logs of Uniswap Swaps
+Including:
+
+* Pending Transactions and retriving Transactions
+* New header subscriptions
+* Rpc Calls
+* Logs Erc20 Subscriptions
+* Logs Uniswap Swap Subscrptions
+* Logs Uniswap Sync Subscriptions
