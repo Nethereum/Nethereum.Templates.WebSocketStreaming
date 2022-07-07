@@ -7,7 +7,6 @@
     },
     "identity": "nethererum.websocketstreaming",
     "shortName": "nethereum-ws-stream",
-    "sourceName": "NethereumWSStreaming",
     "guids": [
         "{9A19103F-16F7-4668-BE54-9A1E7A4F7556}"
     ],
